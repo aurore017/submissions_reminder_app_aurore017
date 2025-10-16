@@ -1,36 +1,41 @@
 #!/bin/bash
 
-parent_dir="submission_remainder_*/"
+# Define main variables and file paths
+parent="submission_remainder_*/"
 star="startup.sh"
 config="./submission_remainder_*/config/config.env"
 continuation="y"
-assignment_name="" # Initialize the variable to hold the user's input
+assignment_name="" # Stores the assignment name entered by the user
 
+# Function to process a given assignment
 copilot_function() {
-    # The assignment name is passed as the first argument
-    assignment="$1"
+    assignment="$1" # Capture the assignment name as an argument
 
-    if [ ! -d $parent_dir ]; then
+    # Check if the required directory exists
+    if [ ! -d $parent ]; then
         sleep 0.9
         echo "The directory doesn't exist. Please run the file create_environment.sh"
         echo " "
         exit 1
     else
+        # Update the ASSIGNMENT variable inside the configuration file
         sed -i "s/ASSIGNMENT=\".*\"/ASSIGNMENT=\"$assignment_name\"/" $config
 
         echo "Processing '$assignment' assignment"
 
- cd $parent_dir
+        # Navigate to the target directory and run the startup script
+        cd $parent
         if [ ! -f $star ]; then
             echo "Error: $star not found."
             exit 1
         else
-            ./$star
-            cd ..
+            ./$star  # Execute the startup script
+            cd ..    # Return to the previous directory
         fi
     fi
 }
 
+# Main loop: allows multiple assignments to be processed sequentially
 while [[ "$continuation" == "y" || "$continuation" == "Y" ]]; do
     echo " "
     echo "Which assignment do you want to check?"
@@ -39,17 +44,17 @@ Shell Navigation
 Shell Basics
 Git"
 
-    # Capture user input for the assignment name
+    # Prompt user for the assignment name
     read -p "Enter the assignment name: " assignment_name
 
-# Read the assignment name directly into assignment_name
-    read -p "Enter the assignment name: " assignment_name
-
-    # Run the function using the name provided by the user
+    # Run the function with the provided assignment name
     copilot_function "$assignment_name"
 
     echo " "
+    # Ask if the user wants to process another assignment
     read -p "Do you want to analyze another assignment (y/n): " continuation
 done
 
-echo -e "Exiting"
+# Exit message after the loop finishes
+echo -e "Exiting"
+
